@@ -1,22 +1,31 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
+import { useSelector,useDispatch } from "react-redux";
 import LoadingCard from "./LoadingCard";
+import { getPost,deletePost, setEdit } from "../redux/features/postSlice";
 
 import { Button, Card, Input, Space } from "antd";
 
 const UserPost = ({ history }) => {
   const [id, setId] = useState();
   const [bodyText, setBodyText] = useState("");
-
+  const dispatch=useDispatch();
+  
+const{loading,post,edit,body}=useSelector((state)=>({...state.post}))
   const onChangeInput = (e) => {
     setId(e.target.value);
   };
+useEffect(() => {
+  
+setBodyText(body);
+  
+}, [body])
 
 
   const fetchUserPost = () => {
     if (!id) {
       window.alert("Please enter id");
     } else {
-      // dispatch(loadUserPostStart({ id }));
+       dispatch(getPost({ id }));
       setId("");
     }
   };
@@ -43,14 +52,14 @@ const UserPost = ({ history }) => {
       </Space>
       <br />
       <br />
-      {/* {loading ? (
+      {loading ? (
         <LoadingCard count={1} />
       ) : (
         <>
-          {posts.length > 0 && (
+          {post.length > 0 && (
             <div className="site-card-border-less-wrapper">
-              <Card type="inner" title={posts[0].title}>
-                <p>User Id: {posts[0].id}</p>
+              <Card type="inner" title={post[0].title}>
+                <p>User Id: {post[0].id}</p>
                 {edit ? (
                   <>
                     <Input.TextArea
@@ -70,7 +79,7 @@ const UserPost = ({ history }) => {
                     </Space>
                   </>
                 ) : (
-                  <span>{posts[0].body}</span>
+                  <span>{post[0].body}</span>
                 )}
               </Card>
               <Space
@@ -86,16 +95,17 @@ const UserPost = ({ history }) => {
                   type="primary"
                   disabled={edit}
                   danger
+                  onClick={()=>{dispatch(deletePost({id:post[0].id}))}}
                 >
                   Delete
                 </Button>
 
-                <Button type="primary">Edit </Button>
+                <Button type="primary" onClick={()=>{dispatch(setEdit({edit:false,body:post[0].body}))}}>Edit </Button>
               </Space>
             </div>
           )}
         </>
-      )} */}
+      )}
     </div>
   );
 };
